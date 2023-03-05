@@ -1,0 +1,13 @@
+<h2 mat-dialog-title>Select Currencies</h2>
+<div mat-dialog-content>
+  <mat-form-field>
+    <mat-label>Search Currency</mat-label>
+    <input matInput type="text" [(ngModel)]="searchValue" (ngModelChange)="applyFilter()" placeholder="Search currencies" [matAutocomplete]="auto">
+    <mat-autocomplete #auto="matAutocomplete">
+      <mat-option *ngFor="let currency of filteredCurrencies" [value]="currency" (onSelectionChange)="onSelect(currency)">{{ currency }}</mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onClose()">Close</button>
+</div>

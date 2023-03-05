@@ -1,0 +1,142 @@
+<div class="container" style="padding-top: 50px;">
+  <div class="row">
+    <div class="col-lg-6" style="margin-bottom: 25px;">
+      <mat-card class="mb-4">
+        <mat-card-header class="bg-primary text-white d-flex justify-content-between align-items-center">
+          <mat-card-title>Exchange Rates {{ exchangeRates?.targets[0].date | date:'yyyy-MM-dd' }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="table-responsive">
+            <table mat-table class="table table-hover table-sm" [dataSource]="exchangeRates.targets">
+              <ng-container matColumnDef="currency">
+                <th mat-header-cell *matHeaderCellDef>Currency</th>
+                <td mat-cell *matCellDef="let target" style="vertical-align: middle;">{{ target.currency.toUpperCase() }}</td>
+              </ng-container>
+              <ng-container matColumnDef="rate">
+                <th mat-header-cell *matHeaderCellDef>Rate</th>
+                <td mat-cell *matCellDef="let target" style="vertical-align: middle;">{{ target.rate | number:'1.2-2' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="icon">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let target" class="text-end" (click)="getHistoricalExchangeRates(target.currency, true)">
+                  <button mat-icon-button class="mat-button">
+                    <mat-icon>more_horiz</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="['currency', 'rate', 'icon']"></tr>
+              <tr mat-row *matRowDef="let target; columns: ['currency', 'rate', 'icon']"></tr>
+            </table>
+            <div style="padding: 20px 0 0 20px; background-color: #25252563;" >
+              <mat-form-field>
+                <mat-label>Currency</mat-label>
+                <mat-select [(ngModel)]="selectedCurrency" (selectionChange)="selectCurrency($event.value)" [name]="'selectedCurrencyModel'">
+                  <mat-option *ngFor="let currency of getCurrencies" [value]="currency">{{ currency }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <button mat-icon-button color="primary" class="add-button" (click)="openCurrencySelectionDialog()">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+            <app-target-rates-history [(showForm)]="showTargetRatesHistory" [targets]="this.historicalExchangeRates"></app-target-rates-history>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+    <div class="col-lg-6">
+      <mat-card class="mb-4">
+        <mat-card-header class="bg-primary text-white d-flex justify-content-between align-items-center">
+          <mat-card-title>Convert Currency</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="text-white" style="margin-top: 20px;">
+          <div class="row">
+            <div class="col-md-6 text-center">
+              <mat-form-field class="currency-form-field">
+                <mat-label>From</mat-label>
+                <mat-select id="sourceCurrency" [(ngModel)]="sourceCurrency" [ngModelOptions]="{standalone: true}" (ngModelChange)="getExchangeConversion()" name="sourceCurrencyModel">
+                  <mat-option *ngFor="let currency of getCurrencies" [value]="currency">{{ currency }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-md-6 text-center">
+              <mat-form-field class="currency-form-field">
+                <mat-label>Amount</mat-label>
+                <input matInput id="sourceAmount" type="number" [(ngModel)]="sourceAmount" [min]="0" [ngModelOptions]="{standalone: true}" (ngModelChange)="exchangeConversionBy(true)" name="sourceAmountModel">
+                <span matSuffix class="inner-currency"> <i class="fas fa-long-arrow-alt-right"></i> {{ sourceCurrency }}</span>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 text-center">
+              <mat-form-field class="currency-form-field">
+                <mat-label>To</mat-label>
+                <mat-select id="targetCurrency" [(ngModel)]="targetCurrency" [ngModelOptions]="{standalone: true}" (ngModelChange)="getExchangeConversion()" name="targetCurrencyModel">
+                  <mat-option *ngFor="let currency of getCurrencies" [value]="currency">{{ currency }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-md-6 text-center">
+              <mat-form-field class="currency-form-field">
+                <mat-label>Amount</mat-label>
+                <input matInput id="targetAmount" type="number" [(ngModel)]="targetAmount" [min]="0" [ngModelOptions]="{standalone: true}" (ngModelChange)="exchangeConversionBy(false)" name="targetAmountModel">
+                <span matSuffix class="inner-currency"> <i class="fas fa-long-arrow-alt-right"></i> {{ targetCurrency }}</span>
+              </mat-form-field>
+            </div>
+          </div>
+          <app-target-rates-history [(showForm)]="showTargetConversionsHistory" [targets]="this.historicalExchangeConversions"></app-target-rates-history>
+          <div class="form-group text-end" *ngIf="!showTargetConversionsHistory" style="padding-top: 15px;">
+            <button mat-icon-button class="mat-button" (click)="getHistoricalExchangeConversions(true)">
+              <mat-icon>more_horiz</mat-icon>
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+  <div class="row">
+    <mat-card class="text-white">
+      <mat-card-header>
+        <mat-card-title>Add Exchange Rates</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form>
+          <div *ngFor="let exchange of exchanges; let i = index">
+            <div class="row">
+              <div class="col-md-4">
+                <mat-form-field>
+                  <mat-label>Currency</mat-label>
+                  <mat-select [(ngModel)]="exchange.currency" [name]="'exchangeCurrencyModel' + i">
+                    <mat-option *ngFor="let currency of getCurrencies" [value]="currency">{{ currency }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-md-4">
+                <mat-form-field>
+                  <mat-label>Amount</mat-label>
+                  <input matInput type="number" [(ngModel)]="exchange.amount" [name]="'exchangeAmountModel' + i">
+                </mat-form-field>
+              </div>
+              <div class="col-md-4">
+                <mat-form-field>
+                  <mat-label>Date</mat-label>
+                  <input matInput [matDatepicker]="picker" [(ngModel)]="exchange.date" [name]="'matDatepickerModel' + i">
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+                <div>Formatted date: {{ exchange.date | date: 'yyyy-MM-dd' }}</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <button mat-icon-button color="primary" class="add-button" (click)="addExchange()">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+          <div *ngIf="exchanges.length > 0">
+            <button mat-raised-button color="primary" (click)="saveExchanges()">Save</button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

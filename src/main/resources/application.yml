@@ -1,0 +1,50 @@
+server:
+  port: 4000
+
+spring:
+  data:
+    mongodb:
+      #username: root, password: example, database: exchange
+      uri: mongodb://root:example@localhost:27017/exchange?authSource=admin&authMechanism=SCRAM-SHA-1
+  retry:
+    maxAttempts: 3
+    backoff:
+      delay: 100
+      maxDelay: 1000
+      multiplier: 2
+#  cache:
+#    cache-names: exchanges
+#    caffeine:
+#      spec: expireAfterWrite=6h
+
+foreign-exchange:
+  service:
+    host: https://api.apilayer.com
+    api-key: hshQM5iu53nMTJ1etYiT5TE62s6EhtAK # This is a FREE account having Max 250 Requests/Month.
+
+feign:
+  client:
+    config:
+      exchange-service:
+        logger-level: full
+        connectTimeout: 60000 # in milliseconds
+        readTimeout: 45000
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      # This configuration is set up to open the CircuitBreaker after 5 calls have been made to the protected method,
+      # if the failure rate exceeds 50% over a sliding window of the last 10 calls.
+      # Once the CircuitBreaker is open, it will remain open for 10 seconds and allow a
+      # maximum of 2 calls in the half-open state before deciding whether to close or open again.
+      default:
+        # This is the minimum number of calls that must be made to the protected method before the CircuitBreaker can open.
+        minimumNumberOfCalls: 5
+        # This is the percentage of failed calls that will cause the CircuitBreaker to open.
+        failureRateThreshold: 50
+        # This is the time that the CircuitBreaker will remain open before transitioning to the half-open state. (10000 ms = 10 seconds)
+        waitDurationInOpenState: 10000
+        # This is the maximum number of calls that are permitted in the half-open state. (see: waitDurationInOpenState)
+        permittedNumberOfCallsInHalfOpenState: 2
+        # This is the size of the sliding window used to calculate the failure rate. (see: failureRateThreshold)
+        slidingWindowSize: 10

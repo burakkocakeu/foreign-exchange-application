@@ -1,0 +1,34 @@
+<mat-card class="shadow-none" *ngIf="showForm">
+  <mat-card-header class="bg-primary text-white d-flex justify-content-between align-items-center">
+    <mat-card-title>{{ targets[0].currency.toUpperCase() }} Exchange History</mat-card-title>
+    <button mat-icon-button class="mat-button" (click)="closeForm()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="table-responsive">
+      <table mat-table class="table table-hover table-sm" [dataSource]="this.targets">
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef>Date</th>
+          <td mat-cell *matCellDef="let target">{{ target.date }}</td>
+        </ng-container>
+        <ng-container matColumnDef="rate">
+          <th mat-header-cell *matHeaderCellDef>Rate</th>
+          <td mat-cell *matCellDef="let target">{{ target.rate | number:'1.2-2' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="amount" *ngIf="targets[0].amount !== undefined">
+          <th mat-header-cell *matHeaderCellDef>Amount</th>
+          <td mat-cell *matCellDef="let target">{{ target.amount | number:'1.4-4' }}</td>
+        </ng-container>
+        <span *ngIf="targets[0].amount !== undefined">
+          <tr mat-header-row *matHeaderRowDef="['date', 'rate', 'amount']"></tr>
+          <tr mat-row *matRowDef="let target; columns: ['date', 'rate', 'amount']"></tr>
+        </span>
+        <span *ngIf="targets[0].amount === undefined">
+          <tr mat-header-row *matHeaderRowDef="['date', 'rate']"></tr>
+          <tr mat-row *matRowDef="let target; columns: ['date', 'rate']"></tr>
+        </span>
+      </table>
+    </div>
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,28 @@
+.container {
+  /*backdrop-filter: blur(5px);*/
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance:textfield;
+}
+
+.currency-form-field {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.inner-currency {
+  padding: 0px 10px;
+}
+
+.add-button {
+  background-color: rgba(45,45,45,0.75);
+  float: right;
+  margin-right: 20px;
+  margin-top: 5px;
+}
