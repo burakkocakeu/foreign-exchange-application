@@ -16,7 +16,7 @@ This is a web application that allows users to exchange currencies based on curr
 
 To run this application locally, you will need to have Node.js and MongoDB installed on your computer.
 
-    Clone the repository: git clone https://github.com/[your-username]/foreign-exchange-application.git
+    Clone the repository: git clone https://github.com/burakkocakeu/foreign-exchange-application.git
     Navigate to the project root directory: cd foreign-exchange-application
     Build and start the Docker containers: docker-compose up -d
     Build and start the Spring Boot application using Maven: mvn clean spring-boot:run
